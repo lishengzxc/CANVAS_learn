@@ -25,3 +25,13 @@ context.fill();
 context.beginPath();
 context.closePath();
 ```
+####弧和园
+```
+context.arc(
+    centerx, centery, radius,
+    startingAngle, endingAngle,
+    anticlockwise = false
+)
+```
+
+

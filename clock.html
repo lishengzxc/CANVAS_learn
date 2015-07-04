@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<canvas id="canvas" width="1024" height="768"></canvas>
+<script src="digit.js"></script>
+<script>
+    window.onload = function () {
+        var R = 8;
+        var end = new Date();
+        end.setTime(end.getTime() + 3600 * 1000);
+        var cur = 0;
+        var balls = [];
+        var colors = ['#33B5E5', '#0099CC', '#AA66CC', '#9933CC', '#99CC00', '#669900', '#FF8800', '#FF4444', '#CC0000', '#39b94e'];
+
+        function render(cxt) {
+
+            cxt.clearRect(0, 0, 1024, 768);
+            var h = parseInt(cur / 3600);
+            var m = parseInt((cur - h * 3600) / 60);
+            var s = cur % 60;
+
+            renderDigit(0, 0, parseInt(h / 10), cxt);
+            renderDigit(15 * (R + 1), 0, parseInt(h % 10), cxt);
+            renderDigit(30 * (R + 1), 0, 10, cxt);
+            renderDigit(39 * (R + 1), 0, parseInt(m / 10), cxt);
+            renderDigit(54 * (R + 1), 0, parseInt(m % 10), cxt);
+            renderDigit(69 * (R + 1), 0, 10, cxt);
+            renderDigit(78 * (R + 1), 0, parseInt(s / 10), cxt);
+            renderDigit(93 * (R + 1), 0, parseInt(s % 10), cxt);
+
+            for (var i = 0; i < balls.length; i++) {
+                cxt.fillStyle = balls[i].color;
+                cxt.beginPath();
+                cxt.arc(balls[i].x, balls[i].y, R, 0, 2 * Math.PI);
+                cxt.closePath();
+                cxt.fill();
+            }
+
+        }
+
+        function renderDigit(x, y, num, cxt) {
+            cxt.fillStyle = "rgb(0, 102, 153)";
+
+            for (var i = 0; i < digit[num].length; i++) {
+                for (var j = 0; j < digit[num][i].length; j++) {
+                    if (digit[num][i][j] === 1) {
+                        cxt.beginPath();
+                        cxt.arc(x + j * 2 * (R + 1) + (R + 1), y + i * 2 * (R + 1) + (R + 1), R, 0, 2 * Math.PI);
+                        cxt.closePath();
+                        cxt.fill();
+                    }
+                }
+            }
+        }
+
+        function getCur() {
+            var c = new Date();
+            var ret = end.getTime() - c.getTime();
+            ret = Math.round(ret / 1000);
+            return ret >= 0 ? ret : 0;
+        }
+
+        function update() {
+            var next = getCur();
+            var nh = parseInt(next / 3600);
+            var nm = parseInt((next - nh * 3600) / 60);
+            var ns = next % 60;
+
+            var ch = parseInt(cur / 3600);
+            var cm = parseInt((cur - ch * 3600) / 60);
+            var cs = cur % 60;
+
+            if (ns !== cs) {
+                if (parseInt(ch / 10) != parseInt(nh / 10)) {
+                    addBalls(0, 0, parseInt(ch / 10));
+                }
+                if (parseInt(ch % 10) != parseInt(nh % 10)) {
+                    addBalls(15 * (R + 1), 0, parseInt(ch / 10));
+                }
+
+                if (parseInt(cm / 10) != parseInt(nm / 10)) {
+                    addBalls(54 * (R + 1), 0, parseInt(cm / 10));
+                }
+                if (parseInt(cm % 10) != parseInt(nm % 10)) {
+                    addBalls(69 * (R + 1) * (R + 1), 0, parseInt(cm / 10));
+                }
+
+                if (parseInt(cs / 10) != parseInt(ns / 10)) {
+                    addBalls(78 * (R + 1), 0, parseInt(cs / 10));
+                }
+                if (parseInt(cs % 10) != parseInt(ns % 10)) {
+                    addBalls(93 * (R + 1), 0, parseInt(cs / 10));
+                }
+
+                cur = next;
+            }
+            updateBalls();
+        }
+
+        function updateBalls() {
+            for (var i = 0; i < balls.length; i++) {
+                balls[i].x += balls[i].vx;
+                balls[i].y += balls[i].vy;
+                balls[i].vy += balls[i].g;
+
+                if (balls[i].y >= 768 - R) {
+                    balls[i].y = 768 - R;
+                    balls[i].vy = -balls[i].vy * 0.75;
+                }
+            }
+
+            var cnt = 0;
+            for (var i = 0; i < balls.length; i++) {
+                if (balls[i].x + R > 0 && balls[i].x - R < 1024) {
+                    balls[cnt++] = balls[i];
+                }
+            }
+            while (balls.length > cnt) {
+                balls.pop();
+            }
+        }
+
+        function addBalls(x, y, num) {
+
+
+            for (var i = 0; i < digit[num].length; i++) {
+                for (var j = 0; j < digit[num][i].length; j++) {
+                    if (digit[num][i][j] === 1) {
+                        var aBall = {
+                            x: x + j * 2 * (R + 1) + (R + 1),
+                            y: y + i * 2 * (R + 1) + (R + 1),
+                            g: 1.5 + Math.random(),
+                            vx: Math.pow(-1, Math.ceil(Math.random() * 1000)) * 4,
+                            vy: -5,
+                            color: colors[Math.floor(Math.random() * colors.length)]
+                        };
+                        balls.push(aBall);
+                    }
+                }
+            }
+        }
+
+
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        cur = getCur();
+        setInterval(function () {
+            render(context);
+            update();
+        }, 50);
+
+    }
+    ;
+
+</script>
+</body>
+</html>
