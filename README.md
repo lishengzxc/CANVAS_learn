@@ -36,3 +36,9 @@ context.arc(
 
 ####实战
 电子时钟[http://lishengzxc.github.io/CANVAS_learn/clock/](http://lishengzxc.github.io/CANVAS_learn/clock/)
+
+###线条的属性
+ - lineCap
+ - butt
+ - round
+ - square
