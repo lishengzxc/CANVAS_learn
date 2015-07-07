@@ -39,6 +39,6 @@ context.arc(
 
 ###线条的属性
  - lineCap
- - butt
- - round
- - square
+  - butt
+  - round
+  - square
